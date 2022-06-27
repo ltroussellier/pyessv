@@ -56,11 +56,12 @@ def parse_directories(project, directories):
     return result
 
 
-def parse_directory(project, directory):
+def parse_directory(project, directory, strictness=PARSING_STRICTNESS_1):
     """Parses a directory.
 
     :param str project: Project code.
     :param str directory: Data directory.
+    :param int strictness: stricness selection in term comparaison
 
     :returns: Set of terms extracted from the directory.
     :rtype: set
@@ -86,7 +87,8 @@ def parse_directory(project, directory):
 
         assert 'directory_structure' in scope.data.keys(), 'Directory parser not found'
         assert 'template' in scope.data['directory_structure'].keys(), 'Directory parser template not found'
-        assert 'collections' in scope.data['directory_structure'].keys(), 'Directory parser template collections not found'
+        assert 'collections' in scope.data[
+            'directory_structure'].keys(), 'Directory parser template collections not found'
 
         # Get template from data scope.
         _TEMPLATE = scope.data['directory_structure']['template']
@@ -95,11 +97,13 @@ def parse_directory(project, directory):
         # Get template collections from data scope.
         _COLLECTIONS = list()
         for name in scope.data['directory_structure']['collections']:
-            _COLLECTIONS.append([collection.namespace for collection in scope.collections if collection.name == name.replace('_','-')][0])
+            _COLLECTIONS.append(
+                [collection.namespace for collection in scope.collections if collection.name == name.replace('_', '-')][
+                    0])
         assert _COLLECTIONS, 'Invalid collections'
 
         # Instantiate parser JIT.
-        _PARSER = create_template_parser(_TEMPLATE, tuple(_COLLECTIONS), PARSING_STRICTNESS_1, separator='/')
+        _PARSER = create_template_parser(_TEMPLATE, tuple(_COLLECTIONS), strictness, separator='/')
 
         # Cached project.
         _PROJECT = project
