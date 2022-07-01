@@ -59,7 +59,7 @@ def parse_filenames(project, filenames):
     return result
 
 
-def parse_filename(project, filename):
+def parse_filename(project, filename, stricness =PARSING_STRICTNESS_1):
     """Parses a filename.
 
     :param str project: Project code.
@@ -81,22 +81,22 @@ def parse_filename(project, filename):
         assert project in [scope.name for scope in scopes], 'Unsupported project'
         scope = [scope for scope in scopes if scope.name == project][0]
 
-        assert 'filename' in scope.data.keys(), 'Filename parser not found'
-        assert 'template' in scope.data['filename'].keys(), 'Filename parser template not found'
-        assert 'collections' in scope.data['filename'].keys(), 'Filename parser template collections not found'
+        assert 'filename_structure' in scope.data.keys(), 'Filename parser not found'
+        assert 'template' in scope.data['filename_structure'].keys(), 'Filename parser template not found'
+        assert 'collections' in scope.data['filename_structure'].keys(), 'Filename parser template collections not found'
 
         # Get template from data scope.
-        _TEMPLATE = scope.data['filename']['template']
+        _TEMPLATE = scope.data['filename_structure']['template']
         assert isinstance(_TEMPLATE, basestring), 'Invalid template'
 
         # Get template collections from data scope.
         _COLLECTIONS = list()
-        for name in scope.data['filename']['collections']:
+        for name in scope.data['filename_structure']['collections']:
             _COLLECTIONS.append([collection.namespace for collection in scope.collections if collection.name == name.replace('_','-')][0])
         assert _COLLECTIONS, 'Invalid collections'
 
         # Instantiate parser JIT.
-        _PARSER = create_template_parser(_TEMPLATE, tuple(_COLLECTIONS), PARSING_STRICTNESS_1, separator='_')
+        _PARSER = create_template_parser(_TEMPLATE, tuple(_COLLECTIONS), stricness, separator='_')
 
         # Cached project.
         _PROJECT = project
